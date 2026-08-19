@@ -17,14 +17,14 @@ export default function ReviewPage() {
   return (
     <PhoneFrame tenant={tenant}>
       <div className="flex flex-col gap-1">
-        <span className="text-[10.5px] font-bold tracking-wide text-[var(--t-primary,var(--brand))] uppercase">Step 5 of 5</span>
+        <span className="text-[10.5px] font-bold tracking-wide text-[var(--t-primary,var(--brand))] uppercase">Step 6 of 6</span>
         <h1 className="text-[19px]">Review your application</h1>
       </div>
-      <ProgressSteps total={5} current={5} />
+      <ProgressSteps total={6} current={6} />
 
       <Card className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
-          <strong className="text-[13px]">Business details</strong>
+          <strong className="text-[13px] text-[var(--t-ink-strong,var(--ink-strong))]">Business details</strong>
           <button className="text-[13px] font-bold text-[var(--t-primary,var(--brand))]" onClick={() => router.push("/applicant/business")}>
             Edit
           </button>
@@ -34,7 +34,7 @@ export default function ReviewPage() {
 
       <Card className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
-          <strong className="text-[13px]">Signatory</strong>
+          <strong className="text-[13px] text-[var(--t-ink-strong,var(--ink-strong))]">Signatory</strong>
           <button className="text-[13px] font-bold text-[var(--t-primary,var(--brand))]" onClick={() => router.push("/applicant/signatory")}>
             Edit
           </button>
@@ -43,7 +43,7 @@ export default function ReviewPage() {
       </Card>
 
       <div className="flex flex-col gap-2">
-        <span className="text-[13px] font-bold">Verification status</span>
+        <span className="text-[13px] font-bold text-[var(--t-ink-strong,var(--ink-strong))]">Verification status</span>
         <VerifyRow label="Trade licence" hint="Source: Authority registry" tone="success">Verified</VerifyRow>
         <VerifyRow label="Emirates ID" hint="Expiry differs from extracted value" tone="warning">Partially matched</VerifyRow>
         <VerifyRow label="VAT certificate" hint="Delegated to bank layer" tone="info">Bank review required</VerifyRow>
@@ -55,7 +55,7 @@ export default function ReviewPage() {
       </label>
 
       <div className="mt-auto flex gap-2.5 pt-2">
-        <Button variant="secondary" onClick={() => router.push("/applicant/documents")}>Back</Button>
+        <Button variant="secondary" onClick={() => router.push("/applicant/processing")}>Back</Button>
         <Button className="flex-1" disabled={!confirmed} onClick={() => router.push("/applicant/confirmation")}>
           Submit application
         </Button>
@@ -67,7 +67,7 @@ export default function ReviewPage() {
 function VerifyRow({ label, hint, tone, children }: { label: string; hint: string; tone: "success" | "warning" | "info"; children: string }) {
   return (
     <div className="flex items-center justify-between rounded-[10px] bg-[var(--t-wash,var(--surface))] p-3">
-      <div className="text-[12.5px]">
+      <div className="text-[12.5px] text-[var(--t-ink,var(--ink))]">
         {label}
         <div className="text-[11px] text-[var(--t-muted,var(--muted))]">{hint}</div>
       </div>

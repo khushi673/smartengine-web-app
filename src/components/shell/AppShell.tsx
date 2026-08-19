@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { Sidebar } from "./Sidebar";
 import { NAV_GROUPS } from "./nav-config";
 import { useTenantTheme } from "./TenantThemeContext";
+import { useViewMode } from "./ViewModeContext";
 import { RouteProgress } from "./RouteProgress";
 
 function findCrumb(pathname: string) {
@@ -21,7 +22,9 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [navOpen, setNavOpen] = useState(false);
   const pathname = usePathname();
   const { tenant, setTenant } = useTenantTheme();
+  const { viewMode, setViewMode } = useViewMode();
   const crumb = findCrumb(pathname);
+  const isApplicant = pathname.startsWith("/applicant");
 
   return (
     <div className="flex h-dvh">
@@ -54,6 +57,33 @@ export function AppShell({ children }: { children: ReactNode }) {
           <span className="hidden rounded-full bg-[var(--brand-wash)] px-2.5 py-1 text-[11.5px] font-bold text-[var(--brand)] sm:inline-flex">
             Day 2–3 checkpoint set
           </span>
+          {isApplicant && (
+            <div className="flex items-center gap-1 rounded-full border border-[var(--border)] bg-[var(--surface)] p-0.5">
+              <button
+                onClick={() => setViewMode("mobile")}
+                className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[12.5px] font-semibold ${
+                  viewMode === "mobile" ? "bg-[var(--brand)] text-white" : "text-[var(--muted)]"
+                }`}
+              >
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                  <rect x="2.5" y="0.5" width="7" height="11" rx="1.5" stroke="currentColor" strokeWidth="1.2" />
+                </svg>
+                Mobile
+              </button>
+              <button
+                onClick={() => setViewMode("web")}
+                className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[12.5px] font-semibold ${
+                  viewMode === "web" ? "bg-[var(--brand)] text-white" : "text-[var(--muted)]"
+                }`}
+              >
+                <svg width="13" height="13" viewBox="0 0 14 12" fill="none" aria-hidden="true">
+                  <rect x="0.5" y="0.5" width="13" height="9" rx="1.2" stroke="currentColor" strokeWidth="1.2" />
+                  <path d="M4.5 11.5h5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+                </svg>
+                Web
+              </button>
+            </div>
+          )}
           <div className="flex items-center gap-1 rounded-full border border-[var(--border)] bg-[var(--surface)] p-0.5">
             <button
               onClick={() => setTenant("oblavo")}
@@ -74,7 +104,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto bg-[var(--surface)] p-8">{children}</main>
+        <main className={`flex-1 overflow-y-auto bg-[var(--surface)] ${isApplicant && viewMode === "web" ? "" : "p-8"}`}>{children}</main>
       </div>
     </div>
   );

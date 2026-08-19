@@ -34,7 +34,7 @@ export default function ResubmissionPage() {
             {openItems.map((v) => (
               <div key={v.field} className="rounded-[10px] border border-[var(--border)] bg-[var(--t-surface,var(--surface-2))] p-3.5">
                 <div className="mb-1 flex items-center justify-between gap-2">
-                  <strong className="text-[13px]">{v.field}</strong>
+                  <strong className="text-[13px] text-[var(--t-ink-strong,var(--ink-strong))]">{v.field}</strong>
                   <Badge tone="warning">{v.state === "mismatch" ? "Confirm" : "Re-verify"}</Badge>
                 </div>
                 <p className="text-[12px] text-[var(--t-muted,var(--muted))]">

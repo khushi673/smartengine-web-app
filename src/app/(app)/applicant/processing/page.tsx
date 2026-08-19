@@ -79,7 +79,7 @@ export default function ProcessingPage() {
                   />
                 )}
                 <div>
-                  <div className="text-[12.5px] font-bold">{s.title}</div>
+                  <div className="text-[12.5px] font-bold text-[var(--t-ink-strong,var(--ink-strong))]">{s.title}</div>
                   <div className="text-[11px] text-[var(--t-muted,var(--muted))]">{s.sub}</div>
                 </div>
               </div>
@@ -117,7 +117,7 @@ function DocResultRow({ name, sub, tone, label }: { name: string; sub: string; t
   return (
     <div className="flex items-center gap-2.5 rounded-[10px] border border-[var(--border)] bg-[var(--t-surface,var(--surface-2))] p-3">
       <div className="flex-1">
-        <div className="text-[13px] font-bold">{name}</div>
+        <div className="text-[13px] font-bold text-[var(--t-ink-strong,var(--ink-strong))]">{name}</div>
         <div className="text-[11px] text-[var(--t-muted,var(--muted))]">{sub}</div>
       </div>
       <Badge tone={tone} dot>
@@ -132,7 +132,7 @@ function ExtractTable({ title, rows }: { title: string; rows: FieldRow[] }) {
   return (
     <div className="rounded-[10px] border border-[var(--border)] p-3.5">
       <div className="mb-2.5 flex items-center justify-between gap-2">
-        <strong className="text-[12.5px]">{title}</strong>
+        <strong className="text-[12.5px] text-[var(--t-ink-strong,var(--ink-strong))]">{title}</strong>
         <Badge tone={matchedCount === rows.length ? "success" : "warning"}>
           {matchedCount} of {rows.length} matched
         </Badge>
@@ -148,7 +148,7 @@ function ExtractTable({ title, rows }: { title: string; rows: FieldRow[] }) {
         </thead>
         <tbody>
           {rows.map((r) => (
-            <tr key={r.field} className="border-t border-[var(--border)]">
+            <tr key={r.field} className="border-t border-[var(--border)] text-[var(--t-ink,var(--ink))]">
               <td className="py-1.5">{r.field}</td>
               <td className="py-1.5">{r.entered}</td>
               <td className="py-1.5">{r.read}</td>

@@ -36,7 +36,7 @@ export default function DocumentsPage() {
       <hr className="border-[var(--border)]" />
 
       <div className="flex flex-col gap-2.5">
-        <span className="text-[13px] font-bold">Trade licence — upload preview</span>
+        <span className="text-[13px] font-bold text-[var(--t-ink-strong,var(--ink-strong))]">Trade licence — upload preview</span>
 
         {upload === "idle" && (
           <div className="flex flex-col items-center gap-2 rounded-[10px] border-[1.5px] border-dashed border-[var(--border-strong)] bg-[var(--t-surface,var(--surface))] p-5 text-center">
@@ -45,7 +45,7 @@ export default function DocumentsPage() {
                 <path d="M9 3v9M5 8l4-4 4 4M3 15h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
-            <strong className="text-[13px]">Drag file or tap to browse</strong>
+            <strong className="text-[13px] text-[var(--t-ink-strong,var(--ink-strong))]">Drag file or tap to browse</strong>
             <span className="text-[11.5px] text-[var(--t-muted,var(--muted))]">JPG, PNG or PDF</span>
             <div className="flex gap-2 pt-1">
               <Button size="sm" variant="secondary" onClick={() => simulate("good")}>Simulate clear scan</Button>
@@ -57,7 +57,7 @@ export default function DocumentsPage() {
         {upload === "busy" && (
           <Card flat className="flex flex-col gap-2">
             <div className="flex justify-between text-[13px]">
-              <span>trade_licence_scan.jpg</span>
+              <span className="text-[var(--t-ink,var(--ink))]">trade_licence_scan.jpg</span>
               <span className="text-[var(--t-muted,var(--muted))]">Checking…</span>
             </div>
             <div className="h-1.5 overflow-hidden rounded-full bg-[var(--border)]">
@@ -71,16 +71,16 @@ export default function DocumentsPage() {
           <Card className="flex flex-col gap-2.5 border-[var(--success-solid)]">
             <div className="flex items-center justify-between">
               <Badge tone="success" dot>Quality passed</Badge>
-              <button className="text-[12.5px] font-bold text-[var(--muted)]" onClick={() => setUpload("idle")}>
+              <button className="text-[12.5px] font-bold text-[var(--t-muted,var(--muted))]" onClick={() => setUpload("idle")}>
                 Replace
               </button>
             </div>
             <div className="flex items-center gap-2.5">
               <div className="flex h-7.5 w-7.5 items-center justify-center rounded-lg bg-[var(--success-bg)]">✅</div>
-              <span className="text-[13px]">trade_licence_scan.jpg <span className="text-[var(--muted)]">· 2.1MB</span></span>
+              <span className="text-[13px] text-[var(--t-ink,var(--ink))]">trade_licence_scan.jpg <span className="text-[var(--t-muted,var(--muted))]">· 2.1MB</span></span>
             </div>
             <hr className="border-[var(--border)]" />
-            <span className="text-[11.5px] font-bold">Data extracted</span>
+            <span className="text-[11.5px] font-bold text-[var(--t-ink-strong,var(--ink-strong))]">Data extracted</span>
             <div className="flex flex-wrap gap-2">
               <Badge tone="info">Licence No. 774521</Badge>
               <Badge tone="info">Expiry 12 Mar 2027</Badge>
@@ -94,7 +94,7 @@ export default function DocumentsPage() {
             <Badge tone="warning" dot>Attention required</Badge>
             <div className="flex items-center gap-2.5">
               <div className="flex h-7.5 w-7.5 items-center justify-center rounded-lg bg-[var(--warning-bg)]">⚠️</div>
-              <span className="text-[13px]">trade_licence_scan.jpg <span className="text-[var(--muted)]">· image unreadable</span></span>
+              <span className="text-[13px] text-[var(--t-ink,var(--ink))]">trade_licence_scan.jpg <span className="text-[var(--t-muted,var(--muted))]">· image unreadable</span></span>
             </div>
             <p className="text-[12.5px] text-[var(--warning-text)]">
               We couldn&apos;t read this file clearly. Please retake the photo in good lighting with all four corners visible.
@@ -117,7 +117,7 @@ function DocRow({ icon, name, hint, status }: { icon: string; name: string; hint
     <div className="flex items-center gap-2.5 rounded-[10px] border border-[var(--border)] bg-[var(--t-surface,var(--surface-2))] p-3">
       <div className="flex h-7.5 w-7.5 shrink-0 items-center justify-center rounded-lg bg-[var(--t-wash,var(--surface))]">{icon}</div>
       <div className="flex flex-1 flex-col gap-0.5">
-        <strong className="text-[13px]">{name}</strong>
+        <strong className="text-[13px] text-[var(--t-ink-strong,var(--ink-strong))]">{name}</strong>
         <span className="text-[11.5px] text-[var(--t-muted,var(--muted))]">{hint}</span>
       </div>
       {status}

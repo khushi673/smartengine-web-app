@@ -34,12 +34,12 @@ export default function InvitationPage() {
 
           <Card flat className="flex flex-col gap-2.5">
             <div className="flex items-center justify-between">
-              <span className="text-[13px] font-bold">What you&apos;ll need</span>
+              <span className="text-[13px] font-bold text-[var(--t-ink-strong,var(--ink-strong))]">What you&apos;ll need</span>
               <Badge tone="info">~12–15 min</Badge>
             </div>
             <div className="flex flex-col gap-2">
               {checklist.map((item) => (
-                <div key={item} className="flex items-center gap-2 text-[13px]">
+                <div key={item} className="flex items-center gap-2 text-[13px] text-[var(--t-ink,var(--ink))]">
                   <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
                     <path d="M3 8l3 3 7-7" stroke="var(--success-solid)" strokeWidth="1.6" fill="none" strokeLinecap="round" />
                   </svg>

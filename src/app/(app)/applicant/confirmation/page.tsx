@@ -27,7 +27,7 @@ export default function ConfirmationPage() {
         </div>
         <h1 className="text-[20px]">Application submitted</h1>
         <p className="text-[12.5px] text-[var(--t-muted,var(--muted))]">Your reference number</p>
-        <div className="font-display text-xl font-extrabold tracking-wide tabular-nums">SE-2026-081402</div>
+        <div className="font-display text-xl font-extrabold tracking-wide text-[var(--t-ink-strong,var(--ink-strong))] tabular-nums">SE-2026-081402</div>
 
         <Card flat className="mt-3 w-full text-left">
           <div className="flex flex-col gap-3.5">
@@ -39,8 +39,8 @@ export default function ConfirmationPage() {
                   }`}
                 />
                 <div>
-                  <strong className="text-[13px]">{t.label}</strong>
-                  <div className="text-[11px] text-[var(--muted)]">{t.hint}</div>
+                  <strong className="text-[13px] text-[var(--t-ink-strong,var(--ink-strong))]">{t.label}</strong>
+                  <div className="text-[11px] text-[var(--t-muted,var(--muted))]">{t.hint}</div>
                 </div>
               </div>
             ))}
