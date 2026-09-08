@@ -3,6 +3,14 @@
 import { createContext, useCallback, useContext, useMemo, useState, ReactNode } from "react";
 import { Case, CaseStatus, cases as seedCases, TimelineEvent } from "@/lib/mock-data";
 
+export interface AddCaseInput {
+  business: string;
+  campaignId: string;
+  invitationId: string;
+  segment?: string;
+  adcbReference?: string;
+}
+
 interface CaseStoreValue {
   listCases: () => Case[];
   getCase: (id: string) => Case | undefined;
@@ -10,6 +18,8 @@ interface CaseStoreValue {
   requestInformation: (id: string, note: string) => void;
   requestCorrection: (id: string, field: string, note: string) => void;
   resolveOpenItems: (id: string) => void;
+  addCase: (input: AddCaseInput) => string;
+  logEvent: (id: string, event: TimelineEvent, statusUpdate?: CaseStatus) => void;
 }
 
 const CaseStoreContext = createContext<CaseStoreValue | null>(null);
@@ -42,6 +52,7 @@ export function CaseStoreProvider({ children }: { children: ReactNode }) {
         actor: "Operations",
         timestamp: nowLabel(),
         tone: "success",
+        kind: "handoff",
       });
       return { ...prev, [id]: updated };
     });
@@ -56,6 +67,7 @@ export function CaseStoreProvider({ children }: { children: ReactNode }) {
         actor: "Operations",
         timestamp: nowLabel(),
         tone: "warning",
+        kind: "note",
       });
       return { ...prev, [id]: updated };
     });
@@ -70,6 +82,7 @@ export function CaseStoreProvider({ children }: { children: ReactNode }) {
         actor: "Operations",
         timestamp: nowLabel(),
         tone: "warning",
+        kind: "note",
       });
       return { ...prev, [id]: updated };
     });
@@ -89,8 +102,48 @@ export function CaseStoreProvider({ children }: { children: ReactNode }) {
           actor: "Applicant",
           timestamp: nowLabel(),
           tone: "success",
+          kind: "verification",
         }
       );
+      return { ...prev, [id]: updated };
+    });
+  }, []);
+
+  const addCase = useCallback((input: AddCaseInput) => {
+    const id = `${input.business.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}-${Math.random().toString(36).slice(2, 6)}`;
+    const ref = `SE-2026-${Math.floor(100000 + Math.random() * 899999)}`;
+    const newCase: Case = {
+      id,
+      ref,
+      business: input.business,
+      structure: "",
+      tradeLicenceNo: "",
+      emirate: "",
+      signatoryName: "",
+      signatoryRole: "",
+      signatoryEmail: "",
+      signatoryPhone: "",
+      status: "invited",
+      ageHours: 0,
+      assignee: null,
+      existingCustomer: false,
+      campaignId: input.campaignId,
+      segment: input.segment,
+      adcbReference: input.adcbReference,
+      invitationId: input.invitationId,
+      verification: [],
+      documents: [],
+      timeline: [{ label: "Invitation sent", actor: "Operations", timestamp: nowLabel(), kind: "status" }],
+    };
+    setStore((prev) => ({ ...prev, [id]: newCase }));
+    return id;
+  }, []);
+
+  const logEvent = useCallback((id: string, event: TimelineEvent, statusUpdate?: CaseStatus) => {
+    setStore((prev) => {
+      const c = prev[id];
+      if (!c) return prev;
+      const updated = withTimeline(statusUpdate ? { ...c, status: statusUpdate } : c, event);
       return { ...prev, [id]: updated };
     });
   }, []);
@@ -103,8 +156,10 @@ export function CaseStoreProvider({ children }: { children: ReactNode }) {
       requestInformation,
       requestCorrection,
       resolveOpenItems,
+      addCase,
+      logEvent,
     }),
-    [store, markReadyForHandoff, requestInformation, requestCorrection, resolveOpenItems]
+    [store, markReadyForHandoff, requestInformation, requestCorrection, resolveOpenItems, addCase, logEvent]
   );
 
   return <CaseStoreContext.Provider value={value}>{children}</CaseStoreContext.Provider>;

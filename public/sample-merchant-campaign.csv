@@ -1,9 +1,6 @@
-business_name,trade_licence_no,emirate,signatory_name,signatory_email,signatory_phone
-Coral Bay Trading LLC,881204,Dubai,Amina Rashid,amina.rashid@coralbaytrading.ae,+971 50 214 7788
-Silverline Auto Parts LLC,772915,Sharjah,Hassan Youssef,hassan.y@silverlineauto.ae,+971 55 331 0092
-Desert Rose Foodstuff Trading,660318,Abu Dhabi,Layla Mansoor,layla.mansoor@desertrosefoods.ae,+971 52 447 6621
-Falcon Wing Logistics FZE,904472,Dubai,Tariq Al Nuaimi,tariq.alnuaimi@falconwinglogistics.com,+971 56 890 1123
-Blue Harbor Marine Supplies LLC,558201,Ras Al Khaimah,Noora Saeed,noora.saeed@blueharbormarine.ae,+971 50 762 4409
-Golden Dune Construction LLC,712664,Abu Dhabi,Khalid Ibrahim,khalid.ibrahim@goldendune.ae,+971 54 118 3350
-Palm Ridge Electronics Trading,839027,Dubai,Reem Al Falasi,reem.alfalasi@palmridgeelec.ae,+971 55 602 9917
-Oasis Fresh Mart LLC,477135,Sharjah,Yousef Haddad,yousef.haddad@oasisfreshmart.ae,+971 52 209 6644
+adcb_reference,company_name,contact_name,email,mobile,preferred_channel,segment
+ADCB-REF-20011,Coral Bay Trading LLC,Amina Rashid,amina.rashid@coralbaytrading.ae,+971502147788,email,SME
+ADCB-REF-20012,Silverline Auto Parts LLC,Hassan Youssef,hassan.y@silverlineauto.ae,+971553310092,both,SME
+,Desert Rose Foodstuff Trading,Layla Mansoor,layla.mansoor@desertrosefoods.ae,+971524476621,sms,F&B
+ADCB-REF-20014,Blue Harbor Marine Supplies LLC,Noora Saeed,noora.saeed@blueharbormarine.ae,+971507624409,email,Existing customer
+ADCB-REF-20015,Golden Dune Construction LLC,Khalid Ibrahim,khalid.ibrahim@goldendune.ae,+971541183350,both,Corporate

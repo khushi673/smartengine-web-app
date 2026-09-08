@@ -1,69 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { ChangeEvent, useState } from "react";
 import { DesktopFrame } from "@/components/ui/DeviceFrame";
 import { Panel } from "@/components/ui/Card";
 import { KpiTile } from "@/components/ui/KpiTile";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { Modal } from "@/components/ui/Modal";
-import { Field, Input, Select } from "@/components/ui/Field";
-import { useToast } from "@/components/shell/ToastContext";
 import { dashboardMetrics, cases } from "@/lib/mock-data";
-
-interface CsvRow {
-  business_name: string;
-  trade_licence_no: string;
-  emirate: string;
-  signatory_name: string;
-  signatory_email: string;
-  signatory_phone: string;
-  hasError: boolean;
-}
-
-function parseTargetListCsv(text: string): CsvRow[] {
-  const lines = text.trim().split(/\r?\n/).filter(Boolean);
-  const [headerLine, ...dataLines] = lines;
-  const headers = headerLine.split(",").map((h) => h.trim());
-  return dataLines.map((line) => {
-    const cells = line.split(",").map((c) => c.trim());
-    const row = Object.fromEntries(headers.map((h, i) => [h, cells[i] ?? ""])) as unknown as CsvRow;
-    row.hasError = !row.business_name || !row.signatory_email;
-    return row;
-  });
-}
 
 export default function OpsDashboardPage() {
   const m = dashboardMetrics;
-  const { showToast } = useToast();
-  const [campaignOpen, setCampaignOpen] = useState(false);
-  const [campaignName, setCampaignName] = useState("");
-  const [csvFileName, setCsvFileName] = useState<string | null>(null);
-  const [csvRows, setCsvRows] = useState<CsvRow[] | null>(null);
-
-  const onCsvChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setCsvFileName(file.name);
-    file.text().then((text) => setCsvRows(parseTargetListCsv(text)));
-  };
-
-  const resetCampaignForm = () => {
-    setCampaignName("");
-    setCsvFileName(null);
-    setCsvRows(null);
-  };
-
-  const createCampaign = () => {
-    const count = csvRows?.length ?? 0;
-    const errorCount = csvRows?.filter((r) => r.hasError).length ?? 0;
-    const name = campaignName || "Untitled campaign";
-    const detail = count > 0 ? ` with ${count} merchant${count > 1 ? "s" : ""}${errorCount > 0 ? ` (${errorCount} need attention before sending)` : ""}` : "";
-    showToast(`"${name}" created${detail} (demo only — no backend yet).`, "success");
-    setCampaignOpen(false);
-    resetCampaignForm();
-  };
 
   return (
     <DesktopFrame>
@@ -73,7 +19,9 @@ export default function OpsDashboardPage() {
             <h2 className="text-[19px]">Operations dashboard</h2>
             <span className="text-[13px] text-[var(--muted)]">Meridian Bank · Q3 Merchant Card Programme</span>
           </div>
-          <Button size="sm" onClick={() => setCampaignOpen(true)}>+ New campaign</Button>
+          <Link href="/ops/campaigns/new">
+            <Button size="sm">+ New campaign</Button>
+          </Link>
         </div>
 
         <div className="flex flex-wrap gap-3">
@@ -108,7 +56,7 @@ export default function OpsDashboardPage() {
             <hr className="my-4 border-[var(--border)]" />
             <div className="mb-2 flex items-center justify-between text-[13px]">
               <strong>Non-responders (7+ days)</strong>
-              <Link href="/ops/queue" className="font-bold text-[var(--brand)]">
+              <Link href="/ops/non-responders" className="font-bold text-[var(--brand)]">
                 View all
               </Link>
             </div>
@@ -151,83 +99,6 @@ export default function OpsDashboardPage() {
           </Panel>
         </div>
       </div>
-
-      <Modal
-        open={campaignOpen}
-        onClose={() => {
-          setCampaignOpen(false);
-          resetCampaignForm();
-        }}
-        title="New campaign"
-        footer={
-          <>
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => {
-                setCampaignOpen(false);
-                resetCampaignForm();
-              }}
-            >
-              Cancel
-            </Button>
-            <Button size="sm" onClick={createCampaign}>Create campaign</Button>
-          </>
-        }
-      >
-        <div className="flex flex-col gap-3.5">
-          <Field label="Campaign name">
-            <Input value={campaignName} onChange={(e) => setCampaignName(e.target.value)} placeholder="e.g. Q4 Merchant Card Programme" />
-          </Field>
-          <Field label="Journey template">
-            <Select defaultValue="standard">
-              <option value="standard">Standard merchant onboarding</option>
-              <option value="fleet">Fleet card onboarding</option>
-            </Select>
-          </Field>
-          <Field label="Target list">
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-2">
-                <label className="inline-flex cursor-pointer items-center rounded-md border-[1.5px] border-[var(--border-strong)] bg-[var(--surface-2)] px-3 py-2 text-[12.5px] font-bold text-[var(--ink)] hover:bg-[var(--surface)]">
-                  {csvFileName ?? "Choose CSV file"}
-                  <input type="file" accept=".csv" className="hidden" onChange={onCsvChange} />
-                </label>
-                <a href="/sample-merchant-campaign.csv" download className="text-[12px] font-bold text-[var(--brand)]">
-                  Download sample CSV
-                </a>
-              </div>
-              <span className="text-[11.5px] text-[var(--muted)]">
-                Documented batch/API contract from Phase 2 — this pilot flow accepts CSV. Duplicates and missing fields are flagged before
-                invitations send.
-              </span>
-
-              {csvRows && (
-                <div className="mt-1 flex flex-col gap-2 rounded-lg border border-[var(--border)] bg-[var(--surface)] p-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[12.5px] font-bold">
-                      {csvRows.length} merchant{csvRows.length === 1 ? "" : "s"} detected
-                    </span>
-                    {csvRows.some((r) => r.hasError) ? (
-                      <Badge tone="warning">{csvRows.filter((r) => r.hasError).length} need attention</Badge>
-                    ) : (
-                      <Badge tone="success">All rows valid</Badge>
-                    )}
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    {csvRows.slice(0, 3).map((r, i) => (
-                      <div key={i} className={`flex justify-between text-[11.5px] ${r.hasError ? "text-[var(--warning-text)]" : "text-[var(--muted)]"}`}>
-                        <span>{r.business_name || "(missing business name)"}</span>
-                        <span>{r.emirate}</span>
-                      </div>
-                    ))}
-                    {csvRows.length > 3 && <span className="text-[11px] text-[var(--muted)]">+{csvRows.length - 3} more</span>}
-                  </div>
-                </div>
-              )}
-            </div>
-          </Field>
-        </div>
-      </Modal>
     </DesktopFrame>
   );
 }

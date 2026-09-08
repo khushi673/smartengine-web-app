@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { CaseStatus, CASE_STATUS_LABEL, VerificationState, VERIFICATION_LABEL } from "@/lib/mock-data";
+import { CaseStatus, CASE_STATUS_LABEL, VerificationState, VERIFICATION_LABEL, InvitationStatus, INVITATION_STATUS_LABEL } from "@/lib/mock-data";
 
 export type Tone = "success" | "warning" | "danger" | "info" | "neutral";
 
@@ -41,17 +41,40 @@ export function Badge({ tone = "neutral", dot, children }: { tone?: Tone; dot?: 
 }
 
 const caseStatusTone: Record<CaseStatus, Tone> = {
+  invited: "neutral",
+  in_progress: "info",
   submitted: "neutral",
-  under_review: "warning",
+  under_review: "info",
   info_requested: "danger",
+  verification_exception: "danger",
   ready_for_handoff: "success",
-  handed_off: "info",
+  handed_off: "success",
+  approved: "success",
+  rejected: "neutral",
+  closed: "neutral",
 };
 
 export function CaseStatusBadge({ status }: { status: CaseStatus }) {
   return (
     <Badge tone={caseStatusTone[status]} dot>
       {CASE_STATUS_LABEL[status]}
+    </Badge>
+  );
+}
+
+const invitationStatusTone: Record<InvitationStatus, Tone> = {
+  sent: "neutral",
+  delivered: "info",
+  failed: "danger",
+  opened: "info",
+  expired: "danger",
+  cancelled: "neutral",
+};
+
+export function InvitationStatusBadge({ status }: { status: InvitationStatus }) {
+  return (
+    <Badge tone={invitationStatusTone[status]} dot>
+      {INVITATION_STATUS_LABEL[status]}
     </Badge>
   );
 }

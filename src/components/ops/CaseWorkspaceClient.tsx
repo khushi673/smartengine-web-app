@@ -9,7 +9,17 @@ import { TableWrap, Th, Td } from "@/components/ui/Table";
 import { Modal } from "@/components/ui/Modal";
 import { useCaseStore } from "@/components/shell/CaseStoreContext";
 import { useToast } from "@/components/shell/ToastContext";
-import { VerificationCheck, VerificationState } from "@/lib/mock-data";
+import { VerificationCheck, VerificationState, TimelineEventKind } from "@/lib/mock-data";
+
+const TIMELINE_ICON: Record<TimelineEventKind, string> = {
+  status: "🗂️",
+  document: "📄",
+  note: "✉️",
+  signatory: "🖊️",
+  verification: "🔎",
+  handoff: "🤝",
+  consent: "✅",
+};
 
 const RESULT_LABEL: Record<VerificationState, string> = {
   verified: "Match",
@@ -177,19 +187,20 @@ export function CaseWorkspaceClient({ caseId }: { caseId: string }) {
               </div>
             </SectionCard>
 
-            <SectionCard title="Timeline & audit">
+            <SectionCard title="Timeline & audit" sub="Every status change, document event, and applicant/officer action, in order.">
               <div className="flex flex-col gap-3.5">
                 {c.timeline.map((t, i) => (
                   <div key={`${t.label}-${i}`} className="flex gap-2.5">
-                    <span
-                      className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${
-                        t.tone === "success" ? "bg-[var(--success-solid)]" : t.tone === "warning" ? "bg-[var(--warning-solid)]" : "bg-[var(--brand)]"
-                      }`}
-                    />
+                    <span className="mt-0.5 flex h-5.5 w-5.5 shrink-0 items-center justify-center rounded-full bg-[var(--surface)] text-[11px]">
+                      {TIMELINE_ICON[t.kind ?? "status"]}
+                    </span>
                     <div>
                       <strong className="text-[13px]">{t.label}</strong>
+                      {t.detail && <div className="text-[11.5px] text-[var(--muted)]">{t.detail}</div>}
                       <div className="text-[11px] text-[var(--muted)]">
                         {t.timestamp} · {t.actor}
+                        {t.tone === "warning" && <span className="ml-1.5 font-bold text-[var(--warning-text)]">· flagged</span>}
+                        {t.tone === "success" && <span className="ml-1.5 font-bold text-[var(--success-text)]">· resolved</span>}
                       </div>
                     </div>
                   </div>

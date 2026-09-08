@@ -6,33 +6,74 @@ import { DesktopFrame } from "@/components/ui/DeviceFrame";
 import { Panel } from "@/components/ui/Card";
 import { TableWrap, Th, Td, TrClickable } from "@/components/ui/Table";
 import { CaseStatusBadge, Badge } from "@/components/ui/Badge";
-import { CaseStatus } from "@/lib/mock-data";
+import { Case } from "@/lib/mock-data";
 import { useCaseStore } from "@/components/shell/CaseStoreContext";
+import { useCampaignStore } from "@/components/shell/CampaignStoreContext";
 
-const STATUS_FILTERS: Array<{ value: CaseStatus | "all"; label: string }> = [
-  { value: "all", label: "All statuses" },
-  { value: "submitted", label: "Submitted" },
-  { value: "under_review", label: "Under review" },
-  { value: "info_requested", label: "Info requested" },
-  { value: "ready_for_handoff", label: "Ready for handoff" },
-  { value: "handed_off", label: "Handed off" },
+const SLA_APPROACHING_HOURS = 48;
+const SLA_BREACHED_HOURS = 72;
+const TERMINAL_STATUSES: Case["status"][] = ["approved", "rejected", "closed", "handed_off"];
+
+function slaFlag(c: Case): "none" | "approaching" | "breached" {
+  if (TERMINAL_STATUSES.includes(c.status)) return "none";
+  if (c.ageHours >= SLA_BREACHED_HOURS) return "breached";
+  if (c.ageHours >= SLA_APPROACHING_HOURS) return "approaching";
+  return "none";
+}
+
+interface View {
+  key: string;
+  label: string;
+  predicate: (c: Case) => boolean;
+}
+
+const VIEWS: View[] = [
+  {
+    key: "requires_action",
+    label: "Cases requiring action",
+    predicate: (c) =>
+      c.status === "info_requested" ||
+      c.status === "verification_exception" ||
+      c.status === "under_review" ||
+      c.status === "ready_for_handoff" ||
+      slaFlag(c) !== "none",
+  },
+  { key: "all", label: "All cases", predicate: () => true },
+  { key: "not_opened", label: "Invitations not opened", predicate: (c) => c.status === "invited" },
+  { key: "in_progress", label: "Applications in progress", predicate: (c) => c.status === "in_progress" },
+  { key: "sla", label: "SLA approaching or breached", predicate: (c) => slaFlag(c) !== "none" },
+  { key: "info_requested", label: "Requires information", predicate: (c) => c.status === "info_requested" },
+  { key: "verification_exception", label: "Verification exceptions", predicate: (c) => c.status === "verification_exception" },
+  { key: "ready_for_review", label: "Ready for review", predicate: (c) => c.status === "under_review" },
+  { key: "ready_for_handoff", label: "Ready for handoff", predicate: (c) => c.status === "ready_for_handoff" },
+  { key: "handed_off", label: "Handed off", predicate: (c) => c.status === "handed_off" },
+  {
+    key: "closed_out",
+    label: "Completed, rejected, or closed",
+    predicate: (c) => c.status === "approved" || c.status === "rejected" || c.status === "closed",
+  },
 ];
 
 export default function CaseQueuePage() {
   const router = useRouter();
   const { listCases } = useCaseStore();
+  const { listCampaigns } = useCampaignStore();
   const [search, setSearch] = useState("");
-  const [status, setStatus] = useState<CaseStatus | "all">("all");
+  const [viewKey, setViewKey] = useState(VIEWS[0].key);
+  const [campaignId, setCampaignId] = useState("all");
 
   const cases = listCases();
+  const campaigns = listCampaigns();
+  const view = VIEWS.find((v) => v.key === viewKey) ?? VIEWS[0];
+
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     return cases.filter((c) => {
       const matchesSearch = !q || c.business.toLowerCase().includes(q) || c.ref.toLowerCase().includes(q);
-      const matchesStatus = status === "all" || c.status === status;
-      return matchesSearch && matchesStatus;
+      const matchesCampaign = campaignId === "all" || c.campaignId === campaignId;
+      return matchesSearch && matchesCampaign && view.predicate(c);
     });
-  }, [cases, search, status]);
+  }, [cases, search, campaignId, view]);
 
   return (
     <DesktopFrame>
@@ -47,13 +88,25 @@ export default function CaseQueuePage() {
               className="min-w-40 flex-1 rounded-md border-[1.5px] border-[var(--border-strong)] bg-[var(--surface-2)] px-3 py-2 text-[13px] outline-none focus:border-[var(--brand)]"
             />
             <select
-              value={status}
-              onChange={(e) => setStatus(e.target.value as CaseStatus | "all")}
-              className="min-w-32 rounded-md border-[1.5px] border-[var(--border-strong)] bg-[var(--surface-2)] px-3 py-2 text-[13px]"
+              value={campaignId}
+              onChange={(e) => setCampaignId(e.target.value)}
+              className="min-w-36 rounded-md border-[1.5px] border-[var(--border-strong)] bg-[var(--surface-2)] px-3 py-2 text-[13px]"
             >
-              {STATUS_FILTERS.map((f) => (
-                <option key={f.value} value={f.value}>
-                  {f.label}
+              <option value="all">All campaigns</option>
+              {campaigns.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+            <select
+              value={viewKey}
+              onChange={(e) => setViewKey(e.target.value)}
+              className="min-w-44 rounded-md border-[1.5px] border-[var(--border-strong)] bg-[var(--surface-2)] px-3 py-2 text-[13px]"
+            >
+              {VIEWS.map((v) => (
+                <option key={v.key} value={v.key}>
+                  {v.label}
                 </option>
               ))}
             </select>
@@ -66,6 +119,7 @@ export default function CaseQueuePage() {
               <Th>Case</Th>
               <Th>Business</Th>
               <Th>Status</Th>
+              <Th>SLA</Th>
               <Th>Exceptions</Th>
               <Th>Age</Th>
               <Th>Assignee</Th>
@@ -74,6 +128,7 @@ export default function CaseQueuePage() {
           <tbody>
             {filtered.map((c) => {
               const mismatches = c.verification.filter((v) => v.state === "mismatch" || v.state === "unable_to_verify").length;
+              const sla = slaFlag(c);
               return (
                 <TrClickable key={c.id} onClick={() => router.push(`/ops/queue/${c.id}`)}>
                   <Td className="tabular-nums">{c.ref}</Td>
@@ -84,6 +139,11 @@ export default function CaseQueuePage() {
                     </div>
                   </Td>
                   <Td><CaseStatusBadge status={c.status} /></Td>
+                  <Td>
+                    {sla === "breached" && <Badge tone="danger">Breached</Badge>}
+                    {sla === "approaching" && <Badge tone="warning">Approaching</Badge>}
+                    {sla === "none" && <Badge tone="neutral">On track</Badge>}
+                  </Td>
                   <Td>
                     {mismatches > 0 ? (
                       <Badge tone="warning">{mismatches} mismatch{mismatches > 1 ? "es" : ""}</Badge>
@@ -98,7 +158,7 @@ export default function CaseQueuePage() {
             })}
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-3 py-6 text-center text-[13px] text-[var(--muted)]">
+                <td colSpan={7} className="px-3 py-6 text-center text-[13px] text-[var(--muted)]">
                   No cases match your filters.
                 </td>
               </tr>

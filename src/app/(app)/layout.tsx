@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { TenantThemeProvider } from "@/components/shell/TenantThemeContext";
 import { ViewModeProvider } from "@/components/shell/ViewModeContext";
 import { CaseStoreProvider } from "@/components/shell/CaseStoreContext";
+import { CampaignStoreProvider } from "@/components/shell/CampaignStoreContext";
 import { VerificationRoutesProvider } from "@/components/shell/VerificationRoutesContext";
 import { AdminActivityProvider } from "@/components/shell/AdminActivityContext";
 import { ToastProvider } from "@/components/shell/ToastContext";
@@ -12,13 +13,15 @@ export default function AppLayout({ children }: { children: ReactNode }) {
     <TenantThemeProvider>
       <ViewModeProvider>
         <CaseStoreProvider>
-          <VerificationRoutesProvider>
-            <AdminActivityProvider>
-              <ToastProvider>
-                <AppShell>{children}</AppShell>
-              </ToastProvider>
-            </AdminActivityProvider>
-          </VerificationRoutesProvider>
+          <CampaignStoreProvider>
+            <VerificationRoutesProvider>
+              <AdminActivityProvider>
+                <ToastProvider>
+                  <AppShell>{children}</AppShell>
+                </ToastProvider>
+              </AdminActivityProvider>
+            </VerificationRoutesProvider>
+          </CampaignStoreProvider>
         </CaseStoreProvider>
       </ViewModeProvider>
     </TenantThemeProvider>

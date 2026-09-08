@@ -6,11 +6,13 @@ import { PhoneFrame } from "@/components/ui/DeviceFrame";
 import { Button } from "@/components/ui/Button";
 import { ProgressSteps } from "@/components/ui/ProgressSteps";
 import { useTenantTheme } from "@/components/shell/TenantThemeContext";
+import { useApplicantDraft } from "@/components/shell/ApplicantDraftContext";
 
 export default function ConsentPage() {
   const [checked, setChecked] = useState([false, false]);
   const { tenant } = useTenantTheme();
   const router = useRouter();
+  const { setConsentAccepted } = useApplicantDraft();
   const allChecked = checked.every(Boolean);
 
   const toggle = (i: number) =>
@@ -30,10 +32,10 @@ export default function ConsentPage() {
         <strong className="text-[var(--t-ink,var(--ink))]">Privacy &amp; Data Handling Notice · v2.3</strong>
         <br />
         <br />
-        {tenant === "meridian" ? "Meridian Bank" : "Oblavo"} and Oblavo SmartEngine will collect and process the
-        business and identity information you submit for the sole purpose of merchant onboarding evaluation.
-        Documents are stored securely and only accessed by authorised bank personnel and approved verification
-        providers strictly for this application.
+        {tenant === "meridian" ? "Meridian Bank" : "Oblavo"} and Oblavo SmartEngine will collect, process, extract, verify and transfer the
+        business and identity information you submit — including from documents you upload or scan — for the sole purpose of merchant
+        onboarding evaluation. No document will be read or processed until you accept below. Documents are stored securely and only
+        accessed by authorised bank personnel and approved verification providers strictly for this application.
       </div>
 
       <div className="flex flex-col gap-3">
@@ -43,12 +45,20 @@ export default function ConsentPage() {
         </label>
         <label className="flex items-start gap-2.5 text-[12.5px] text-[var(--t-ink,var(--ink))]">
           <input type="checkbox" className="mt-0.5 accent-[var(--t-primary,var(--brand))]" checked={checked[1]} onChange={() => toggle(1)} />
-          I have read and accept the Privacy &amp; Data Handling Notice v2.3 and consent to verification checks described above.
+          I have read and accept the Privacy &amp; Data Handling Notice v2.3 and consent to the collection, processing, extraction,
+          verification and transfer of my information described above.
         </label>
       </div>
 
       <div className="mt-auto flex flex-col gap-2.5 pt-2">
-        <Button block disabled={!allChecked} onClick={() => router.push("/applicant/business")}>
+        <Button
+          block
+          disabled={!allChecked}
+          onClick={() => {
+            setConsentAccepted(true);
+            router.push("/applicant/documents");
+          }}
+        >
           Accept &amp; continue
         </Button>
         <Button block variant="ghost" onClick={() => router.push("/applicant")}>

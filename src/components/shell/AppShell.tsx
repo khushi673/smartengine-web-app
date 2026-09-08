@@ -15,6 +15,7 @@ function findCrumb(pathname: string) {
   }
   // dynamic case workspace route
   if (pathname.startsWith("/ops/queue/")) return { group: "Bank Operations", title: "Case workspace" };
+  if (pathname === "/ops/campaigns/new") return { group: "Bank Operations", title: "New campaign" };
   return { group: "", title: "" };
 }
 

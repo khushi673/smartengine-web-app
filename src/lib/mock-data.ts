@@ -13,11 +13,17 @@ export type VerificationState =
   | "integration_unavailable";
 
 export type CaseStatus =
+  | "invited"
+  | "in_progress"
   | "submitted"
-  | "under_review"
   | "info_requested"
+  | "verification_exception"
+  | "under_review"
   | "ready_for_handoff"
-  | "handed_off";
+  | "handed_off"
+  | "approved"
+  | "rejected"
+  | "closed";
 
 export interface VerificationCheck {
   field: string;
@@ -34,11 +40,22 @@ export interface CaseDocument {
   quality: "passed" | "attention_required";
 }
 
+export type TimelineEventKind =
+  | "status"
+  | "document"
+  | "note"
+  | "signatory"
+  | "verification"
+  | "handoff"
+  | "consent";
+
 export interface TimelineEvent {
   label: string;
   actor: string;
   timestamp: string;
   tone?: "default" | "warning" | "success";
+  kind?: TimelineEventKind;
+  detail?: string;
 }
 
 export interface Case {
@@ -59,14 +76,24 @@ export interface Case {
   verification: VerificationCheck[];
   documents: CaseDocument[];
   timeline: TimelineEvent[];
+  campaignId?: string;
+  segment?: string;
+  adcbReference?: string;
+  invitationId?: string;
 }
 
 export const CASE_STATUS_LABEL: Record<CaseStatus, string> = {
+  invited: "Invited",
+  in_progress: "In Progress",
   submitted: "Submitted",
-  under_review: "Under review",
-  info_requested: "Info requested",
-  ready_for_handoff: "Ready for handoff",
-  handed_off: "Handed off",
+  info_requested: "Requires Information",
+  verification_exception: "Verification Exception",
+  under_review: "Ready for Review",
+  ready_for_handoff: "Ready for Handoff",
+  handed_off: "Handed Off",
+  approved: "Approved",
+  rejected: "Rejected",
+  closed: "Closed",
 };
 
 export const VERIFICATION_LABEL: Record<VerificationState, string> = {
@@ -96,6 +123,10 @@ export const cases: Case[] = [
     ageHours: 24,
     assignee: "S. Khan",
     existingCustomer: true,
+    campaignId: "sme-sep-2026",
+    segment: "SME",
+    adcbReference: "ADCB-REF-10234",
+    invitationId: "inv-alnoor",
     verification: [
       { field: "Licence expiry", applicantEntered: "12 Mar 2027", extracted: "12 Mar 2027", state: "verified", source: "Authority registry" },
       { field: "Emirates ID expiry", applicantEntered: "04 Jun 2028", extracted: "04 Jun 2027", state: "mismatch", source: "Third-party provider" },
@@ -128,6 +159,9 @@ export const cases: Case[] = [
     ageHours: 96,
     assignee: null,
     existingCustomer: false,
+    campaignId: "existing-pos",
+    segment: "Existing customer",
+    invitationId: "inv-zenith",
     verification: [
       { field: "Licence expiry", applicantEntered: "09 Jan 2026", extracted: "—", state: "unable_to_verify", source: "Authority registry" },
       { field: "Emirates ID expiry", applicantEntered: "21 Nov 2029", extracted: "21 Nov 2029", state: "verified", source: "Third-party provider" },
@@ -158,6 +192,10 @@ export const cases: Case[] = [
     ageHours: 48,
     assignee: "R. Osei",
     existingCustomer: true,
+    campaignId: "sme-sep-2026",
+    segment: "SME",
+    adcbReference: "ADCB-REF-10871",
+    invitationId: "inv-gulf",
     verification: [
       { field: "Licence expiry", applicantEntered: "30 Sep 2027", extracted: "30 Sep 2027", state: "verified", source: "Authority registry" },
       { field: "Emirates ID expiry", applicantEntered: "15 Feb 2030", extracted: "15 Feb 2030", state: "verified", source: "Third-party provider" },
@@ -188,6 +226,9 @@ export const cases: Case[] = [
     ageHours: 6,
     assignee: "S. Khan",
     existingCustomer: false,
+    campaignId: "fnb-migration",
+    segment: "F&B",
+    invitationId: "inv-coastal",
     verification: [
       { field: "Licence expiry", applicantEntered: "18 Jul 2027", extracted: "18 Jul 2027", state: "pending", source: "Authority registry" },
       { field: "Emirates ID expiry", applicantEntered: "02 Oct 2028", extracted: "02 Oct 2028", state: "pending", source: "Third-party provider" },
@@ -196,8 +237,58 @@ export const cases: Case[] = [
       { name: "Trade licence", kind: "trade_licence", version: 1, quality: "passed" },
     ],
     timeline: [
-      { label: "Application submitted", actor: "Applicant", timestamp: "14 Aug 2026, 15:20" },
-      { label: "Verification routed", actor: "SmartEngine", timestamp: "14 Aug 2026, 15:21" },
+      { label: "Application submitted", actor: "Applicant", timestamp: "14 Aug 2026, 15:20", kind: "status" },
+      { label: "Verification routed", actor: "SmartEngine", timestamp: "14 Aug 2026, 15:21", kind: "verification" },
+    ],
+  },
+  {
+    id: "falcon",
+    ref: "SE-2026-081512",
+    business: "Falcon Wing Logistics FZE",
+    structure: "",
+    tradeLicenceNo: "",
+    emirate: "Dubai",
+    signatoryName: "",
+    signatoryRole: "",
+    signatoryEmail: "",
+    signatoryPhone: "",
+    status: "invited",
+    ageHours: 216,
+    assignee: null,
+    existingCustomer: false,
+    campaignId: "existing-pos",
+    segment: "Existing customer",
+    adcbReference: "ADCB-REF-11290",
+    invitationId: "inv-falcon",
+    verification: [],
+    documents: [],
+    timeline: [
+      { label: "Invitation sent", actor: "Operations", timestamp: "05 Sep 2026, 09:10", kind: "status" },
+    ],
+  },
+  {
+    id: "palmridge",
+    ref: "SE-2026-081538",
+    business: "Palm Ridge Electronics Trading",
+    structure: "LLC",
+    tradeLicenceNo: "",
+    emirate: "Dubai",
+    signatoryName: "",
+    signatoryRole: "",
+    signatoryEmail: "",
+    signatoryPhone: "",
+    status: "in_progress",
+    ageHours: 18,
+    assignee: null,
+    existingCustomer: false,
+    campaignId: "sme-sep-2026",
+    segment: "SME",
+    invitationId: "inv-palmridge",
+    verification: [],
+    documents: [],
+    timeline: [
+      { label: "Invitation sent", actor: "Operations", timestamp: "06 Sep 2026, 13:00", kind: "status" },
+      { label: "Invitation link opened", actor: "Applicant", timestamp: "06 Sep 2026, 15:22", kind: "status" },
     ],
   },
 ];
@@ -309,3 +400,172 @@ export const bankUsers: BankUser[] = [
   { name: "Fatima Al Zaabi", role: "Tenant administrator", email: "fatima.alzaabi@meridianbank.ae", status: "active" },
   { name: "James Whitfield", role: "Operations officer", email: "james.whitfield@meridianbank.ae", status: "invited" },
 ];
+
+// ---- Campaigns & invitations ----
+// A campaign is the named business initiative an invitation belongs to; invitation
+// type (individual/bulk) and segment/category are tracked as separate fields per the
+// bank's requirement, never folded into the campaign name itself.
+
+export type CampaignStatus = "draft" | "active" | "closed";
+
+export interface Campaign {
+  id: string;
+  name: string;
+  journeyTemplate: string;
+  segment?: string;
+  createdAt: string;
+  status: CampaignStatus;
+}
+
+export const CAMPAIGN_STATUS_LABEL: Record<CampaignStatus, string> = {
+  draft: "Draft",
+  active: "Active",
+  closed: "Closed",
+};
+
+export const campaigns: Campaign[] = [
+  {
+    id: "sme-sep-2026",
+    name: "SME Merchant Onboarding – September 2026",
+    journeyTemplate: "Standard merchant onboarding",
+    segment: "SME",
+    createdAt: "01 Sep 2026",
+    status: "active",
+  },
+  {
+    id: "existing-pos",
+    name: "Existing POS Merchants",
+    journeyTemplate: "Fleet card onboarding",
+    segment: "Existing customer",
+    createdAt: "18 Aug 2026",
+    status: "active",
+  },
+  {
+    id: "fnb-migration",
+    name: "F&B Merchant Migration",
+    journeyTemplate: "Standard merchant onboarding",
+    segment: "F&B",
+    createdAt: "05 Aug 2026",
+    status: "closed",
+  },
+];
+
+export const getCampaign = (id: string) => campaigns.find((c) => c.id === id);
+
+export type InvitationType = "individual" | "bulk";
+export type InvitationChannel = "email" | "sms" | "both";
+export type InvitationStatus = "sent" | "delivered" | "failed" | "opened" | "expired" | "cancelled";
+
+export const INVITATION_STATUS_LABEL: Record<InvitationStatus, string> = {
+  sent: "Sent",
+  delivered: "Delivered",
+  failed: "Failed",
+  opened: "Opened",
+  expired: "Expired",
+  cancelled: "Cancelled",
+};
+
+export interface Invitation {
+  id: string;
+  campaignId: string;
+  type: InvitationType;
+  applicantName: string;
+  contactName: string;
+  email?: string;
+  mobile?: string;
+  channel: InvitationChannel;
+  adcbReference?: string;
+  segment?: string;
+  status: InvitationStatus;
+  caseId: string;
+  sentAt: string;
+}
+
+export const invitations: Invitation[] = [
+  {
+    id: "inv-alnoor",
+    campaignId: "sme-sep-2026",
+    type: "individual",
+    applicantName: "Al Noor Trading LLC",
+    contactName: "Fatima Al Suwaidi",
+    email: "fatima@alnoortrading.ae",
+    mobile: "+971 50 123 4567",
+    channel: "both",
+    adcbReference: "ADCB-REF-10234",
+    segment: "SME",
+    status: "opened",
+    caseId: "alnoor",
+    sentAt: "14 Aug 2026, 09:30",
+  },
+  {
+    id: "inv-zenith",
+    campaignId: "existing-pos",
+    type: "individual",
+    applicantName: "Zenith Auto Spares",
+    contactName: "Omar Haddad",
+    email: "omar@zenithauto.ae",
+    channel: "email",
+    segment: "Existing customer",
+    status: "opened",
+    caseId: "zenith",
+    sentAt: "10 Aug 2026, 08:50",
+  },
+  {
+    id: "inv-gulf",
+    campaignId: "sme-sep-2026",
+    type: "bulk",
+    applicantName: "Gulf Fresh Mart LLC",
+    contactName: "Aisha Al Mazrouei",
+    mobile: "+971 52 445 1120",
+    channel: "sms",
+    adcbReference: "ADCB-REF-10871",
+    segment: "SME",
+    status: "opened",
+    caseId: "gulf",
+    sentAt: "12 Aug 2026, 07:40",
+  },
+  {
+    id: "inv-coastal",
+    campaignId: "fnb-migration",
+    type: "individual",
+    applicantName: "Coastal Traders FZE",
+    contactName: "Michael Tan",
+    email: "michael@coastaltraders.com",
+    channel: "email",
+    segment: "F&B",
+    status: "opened",
+    caseId: "coastal",
+    sentAt: "14 Aug 2026, 14:55",
+  },
+  {
+    id: "inv-falcon",
+    campaignId: "existing-pos",
+    type: "bulk",
+    applicantName: "Falcon Wing Logistics FZE",
+    contactName: "Tariq Al Nuaimi",
+    email: "tariq.alnuaimi@falconwinglogistics.com",
+    mobile: "+971 56 890 1123",
+    channel: "both",
+    adcbReference: "ADCB-REF-11290",
+    segment: "Existing customer",
+    status: "sent",
+    caseId: "falcon",
+    sentAt: "05 Sep 2026, 09:10",
+  },
+  {
+    id: "inv-palmridge",
+    campaignId: "sme-sep-2026",
+    type: "individual",
+    applicantName: "Palm Ridge Electronics Trading",
+    contactName: "Reem Al Falasi",
+    email: "reem.alfalasi@palmridgeelec.ae",
+    channel: "email",
+    segment: "SME",
+    status: "opened",
+    caseId: "palmridge",
+    sentAt: "06 Sep 2026, 13:00",
+  },
+];
+
+export const listInvitationsForCampaign = (campaignId: string) =>
+  invitations.filter((i) => i.campaignId === campaignId);

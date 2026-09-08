@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { ProgressSteps } from "@/components/ui/ProgressSteps";
 import { Badge, Tone } from "@/components/ui/Badge";
 import { useTenantTheme } from "@/components/shell/TenantThemeContext";
+import { useApplicantDraft } from "@/components/shell/ApplicantDraftContext";
 
 const STEPS = [
   { title: "Trade licence — checking file quality", sub: "Resolution, orientation, completeness" },
@@ -38,6 +39,7 @@ export default function ProcessingPage() {
   const [completed, setCompleted] = useState(0);
   const { tenant } = useTenantTheme();
   const router = useRouter();
+  const { applyOcrExtraction, ocrApplied } = useApplicantDraft();
   const done = completed >= STEPS.length;
 
   useEffect(() => {
@@ -46,13 +48,17 @@ export default function ProcessingPage() {
     return () => clearTimeout(timer);
   }, [completed]);
 
+  useEffect(() => {
+    if (done && !ocrApplied) applyOcrExtraction();
+  }, [done, ocrApplied, applyOcrExtraction]);
+
   return (
     <PhoneFrame tenant={tenant}>
       <div className="flex flex-col gap-1">
-        <span className="text-[10.5px] font-bold tracking-wide text-[var(--t-primary,var(--brand))] uppercase">Step 5 of 6</span>
+        <span className="text-[10.5px] font-bold tracking-wide text-[var(--t-primary,var(--brand))] uppercase">Step 3 of 6</span>
         <h1 className="text-[19px]">{done ? "Here's what we found" : "Processing your documents…"}</h1>
       </div>
-      <ProgressSteps total={6} current={5} />
+      <ProgressSteps total={6} current={3} />
 
       {!done && (
         <div className="flex flex-col gap-2.5">
@@ -105,8 +111,8 @@ export default function ProcessingPage() {
         <Button variant="secondary" onClick={() => router.push("/applicant/documents")}>
           Back
         </Button>
-        <Button className="flex-1" disabled={!done} onClick={() => router.push("/applicant/review")}>
-          {done ? "Continue to review" : "Processing…"}
+        <Button className="flex-1" disabled={!done} onClick={() => router.push("/applicant/business")}>
+          {done ? "Continue to business details" : "Processing…"}
         </Button>
       </div>
     </PhoneFrame>

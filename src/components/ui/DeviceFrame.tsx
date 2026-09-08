@@ -5,12 +5,12 @@ import { usePathname } from "next/navigation";
 import { useViewMode } from "@/components/shell/ViewModeContext";
 
 const STEPS = [
-  { href: "/applicant/consent", label: "Consent & declaration" },
-  { href: "/applicant/business", label: "Business details" },
-  { href: "/applicant/signatory", label: "Signatory details" },
+  { href: "/applicant/consent", label: "Consent & privacy notice" },
   { href: "/applicant/documents", label: "Document upload" },
   { href: "/applicant/processing", label: "AI processing & extraction" },
-  { href: "/applicant/review", label: "Review & submit" },
+  { href: "/applicant/business", label: "Business details" },
+  { href: "/applicant/signatory", label: "Signatory details" },
+  { href: "/applicant/review", label: "Review & final declaration" },
 ];
 
 const TENANT_LABEL: Record<"oblavo" | "meridian", string> = {
