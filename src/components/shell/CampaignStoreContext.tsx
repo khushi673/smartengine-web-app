@@ -27,6 +27,7 @@ export interface NewIndividualInvitationInput {
   channel: InvitationChannel;
   adcbReference?: string;
   segment?: string;
+  existingCustomer?: boolean;
 }
 
 export interface BulkInvitationRow {
@@ -37,6 +38,7 @@ export interface BulkInvitationRow {
   mobile?: string;
   channel: InvitationChannel;
   segment?: string;
+  existingCustomer?: boolean;
 }
 
 interface CampaignStoreValue {
@@ -71,7 +73,14 @@ function sendInvitation(
   campaignId: string,
   type: InvitationType,
   data: Omit<BulkInvitationRow, "channel"> & { channel: InvitationChannel },
-  addCase: (input: { business: string; campaignId: string; invitationId: string; segment?: string; adcbReference?: string }) => string
+  addCase: (input: {
+    business: string;
+    campaignId: string;
+    invitationId: string;
+    segment?: string;
+    adcbReference?: string;
+    existingCustomer?: boolean;
+  }) => string
 ): Invitation {
   const id = makeId(`inv-${data.applicantName}`);
   const caseId = addCase({
@@ -80,6 +89,7 @@ function sendInvitation(
     invitationId: id,
     segment: data.segment,
     adcbReference: data.adcbReference,
+    existingCustomer: data.existingCustomer,
   });
   return {
     id,

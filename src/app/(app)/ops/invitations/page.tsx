@@ -25,6 +25,7 @@ interface ParsedRow {
   mobile?: string;
   channel: InvitationChannel;
   segment?: string;
+  existingCustomer: boolean;
   valid: boolean;
   reasons: string[];
 }
@@ -71,7 +72,9 @@ function parseBulkCsv(text: string, existingEmails: Set<string>, existingMobiles
       channel = "sms";
     }
 
-    return { adcbReference, applicantName, contactName, email, mobile, channel, segment, valid: reasons.length === 0, reasons };
+    const existingCustomer = (segment ?? "").toLowerCase().includes("existing");
+
+    return { adcbReference, applicantName, contactName, email, mobile, channel, segment, existingCustomer, valid: reasons.length === 0, reasons };
   });
 }
 
@@ -147,6 +150,7 @@ function InvitationsPageInner() {
     const [channel, setChannel] = useState<InvitationChannel>("email");
     const [adcbReference, setAdcbReference] = useState("");
     const [segment, setSegment] = useState("");
+    const [existingCustomer, setExistingCustomer] = useState(false);
 
     const canSend = campaignId && applicantName.trim() && contactName.trim() && (email.trim() || mobile.trim());
 
@@ -161,6 +165,7 @@ function InvitationsPageInner() {
         channel,
         adcbReference: adcbReference.trim() || undefined,
         segment: segment.trim() || undefined,
+        existingCustomer,
       });
       onSent();
       setApplicantName("");
@@ -169,6 +174,7 @@ function InvitationsPageInner() {
       setMobile("");
       setAdcbReference("");
       setSegment("");
+      setExistingCustomer(false);
     };
 
     return (
@@ -216,6 +222,15 @@ function InvitationsPageInner() {
             <Input value={segment} onChange={(e) => setSegment(e.target.value)} placeholder="e.g. SME" />
           </Field>
         </div>
+        <label className="flex items-center gap-2 text-[13px] text-[var(--ink)]">
+          <input
+            type="checkbox"
+            checked={existingCustomer}
+            onChange={(e) => setExistingCustomer(e.target.checked)}
+            className="accent-[var(--brand)]"
+          />
+          This is an existing bank customer — pre-fill their application from our records
+        </label>
         <div className="flex justify-end">
           <Button onClick={send} disabled={!canSend}>
             Review and send invitation
@@ -282,6 +297,7 @@ function InvitationsPageInner() {
           mobile: r.mobile,
           channel: r.channel,
           segment: r.segment,
+          existingCustomer: r.existingCustomer,
         }))
       );
       showToast(`${valid.length} invitation${valid.length === 1 ? "" : "s"} sent.`, "success");
@@ -346,7 +362,12 @@ function InvitationsPageInner() {
               <tbody>
                 {rows.map((r, i) => (
                   <tr key={i} className={r.valid ? "" : "bg-[var(--warning-bg)]"}>
-                    <Td>{r.applicantName || "—"}</Td>
+                    <Td>
+                      <div className="flex items-center gap-1.5">
+                        <span>{r.applicantName || "—"}</span>
+                        {r.existingCustomer && <Badge tone="info">Existing customer</Badge>}
+                      </div>
+                    </Td>
                     <Td>{r.contactName || "—"}</Td>
                     <Td>{[r.email, r.mobile].filter(Boolean).join(" · ") || "—"}</Td>
                     <Td>{r.channel}</Td>

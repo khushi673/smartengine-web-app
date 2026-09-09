@@ -9,6 +9,7 @@ export interface AddCaseInput {
   invitationId: string;
   segment?: string;
   adcbReference?: string;
+  existingCustomer?: boolean;
 }
 
 interface CaseStoreValue {
@@ -126,7 +127,7 @@ export function CaseStoreProvider({ children }: { children: ReactNode }) {
       status: "invited",
       ageHours: 0,
       assignee: null,
-      existingCustomer: false,
+      existingCustomer: input.existingCustomer ?? false,
       campaignId: input.campaignId,
       segment: input.segment,
       adcbReference: input.adcbReference,

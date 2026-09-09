@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { TenantHeader, tenantLabel } from "@/components/applicant/TenantHeader";
 import { useTenantTheme } from "@/components/shell/TenantThemeContext";
+import { useApplicantDraft } from "@/components/shell/ApplicantDraftContext";
 
 const checklist = ["Trade licence", "Signatory Emirates ID", "VAT certificate (if registered)"];
 
@@ -15,6 +16,7 @@ export default function InvitationPage() {
   const [expired, setExpired] = useState(false);
   const { tenant } = useTenantTheme();
   const router = useRouter();
+  const { isExistingCustomer, setIsExistingCustomer } = useApplicantDraft();
 
   return (
     <PhoneFrame tenant={tenant}>
@@ -32,10 +34,23 @@ export default function InvitationPage() {
             </p>
           </div>
 
+          {isExistingCustomer && (
+            <Card flat className="flex items-start gap-2.5 border-[var(--info-text)]/30 bg-[var(--info-bg)]">
+              <svg width="16" height="16" viewBox="0 0 20 20" fill="none" className="mt-0.5 shrink-0" aria-hidden="true">
+                <circle cx="10" cy="10" r="7" stroke="var(--info-text)" strokeWidth="1.5" />
+                <path d="M10 9v4M10 6.5h.01" stroke="var(--info-text)" strokeWidth="1.6" strokeLinecap="round" />
+              </svg>
+              <span className="text-[12.5px] text-[var(--t-ink,var(--ink))]">
+                Welcome back — we recognize you as an existing {tenantLabel(tenant)} customer. We&apos;ll pre-fill what we already have on
+                file so you only need to review and confirm it.
+              </span>
+            </Card>
+          )}
+
           <Card flat className="flex flex-col gap-2.5">
             <div className="flex items-center justify-between">
               <span className="text-[13px] font-bold text-[var(--t-ink-strong,var(--ink-strong))]">What you&apos;ll need</span>
-              <Badge tone="info">~12–15 min</Badge>
+              <Badge tone="info">~{isExistingCustomer ? "8–10" : "12–15"} min</Badge>
             </div>
             <div className="flex flex-col gap-2">
               {checklist.map((item) => (
@@ -56,9 +71,16 @@ export default function InvitationPage() {
           <Button block onClick={() => router.push("/applicant/consent")}>
             Start application
           </Button>
-          <Button block variant="ghost" onClick={() => setExpired(true)}>
-            Preview: expired link state
-          </Button>
+
+          <div className="mt-2 flex flex-col gap-1.5 rounded-[10px] border border-dashed border-[var(--border-strong)] p-3">
+            <span className="text-[10.5px] font-bold tracking-wide text-[var(--t-muted,var(--muted))] uppercase">Demo controls</span>
+            <Button block variant="ghost" onClick={() => setIsExistingCustomer(!isExistingCustomer)}>
+              {isExistingCustomer ? "Simulate: new applicant instead" : "Simulate: existing customer"}
+            </Button>
+            <Button block variant="ghost" onClick={() => setExpired(true)}>
+              Preview: expired link state
+            </Button>
+          </div>
         </>
       ) : (
         <div className="flex flex-col items-center gap-2.5 pt-10 text-center">

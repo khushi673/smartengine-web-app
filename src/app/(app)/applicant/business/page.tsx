@@ -18,7 +18,7 @@ const STRUCTURES = [
 export default function BusinessDetailsPage() {
   const { tenant } = useTenantTheme();
   const router = useRouter();
-  const { business, updateBusinessField, ocrApplied } = useApplicantDraft();
+  const { business, updateBusinessField, ocrApplied, isExistingCustomer } = useApplicantDraft();
 
   const canContinue = business.legalName.trim().length > 0 && business.tradeLicenceNo.trim().length > 0;
 
@@ -32,14 +32,16 @@ export default function BusinessDetailsPage() {
       </div>
       <ProgressSteps total={6} current={4} />
 
-      {ocrApplied && (
+      {(isExistingCustomer || ocrApplied) && (
         <Card flat className="flex items-start gap-2.5 border-[var(--info-text)]/30 bg-[var(--info-bg)]">
           <svg width="16" height="16" viewBox="0 0 20 20" fill="none" className="mt-0.5 shrink-0" aria-hidden="true">
             <circle cx="10" cy="10" r="7" stroke="var(--info-text)" strokeWidth="1.5" />
             <path d="M10 9v4M10 6.5h.01" stroke="var(--info-text)" strokeWidth="1.6" strokeLinecap="round" />
           </svg>
           <span className="text-[12.5px] text-[var(--t-ink,var(--ink))]">
-            Pre-filled from your trade licence scan — please review and correct anything that&apos;s wrong.
+            {isExistingCustomer
+              ? "We recognized this business as an existing Meridian Bank customer — details below are pre-filled from your relationship record. Please review and confirm."
+              : "Pre-filled from your trade licence scan — please review and correct anything that's wrong."}
           </span>
         </Card>
       )}

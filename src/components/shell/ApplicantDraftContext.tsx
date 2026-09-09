@@ -30,6 +30,9 @@ export interface SignatoryDraft {
 }
 
 interface ApplicantDraftValue {
+  isExistingCustomer: boolean;
+  setIsExistingCustomer: (v: boolean) => void;
+
   consentAccepted: boolean;
   setConsentAccepted: (v: boolean) => void;
 
@@ -57,6 +60,16 @@ const EXTRACTED_TRADE_LICENCE = {
   legalName: "Al Noor Trading LLC",
   tradeLicenceNo: "774521",
   licenceExpiry: "12 Mar 2027",
+};
+
+// Simulates what the bank's own relationship record already holds for a
+// returning customer — trusted data, so OCR extraction must not overwrite it.
+const EXISTING_CUSTOMER_RECORD = {
+  legalName: "Harbor Light Trading LLC",
+  structure: "llc",
+  tradeLicenceNo: "618204",
+  emirate: "Dubai",
+  licenceExpiry: "22 Jan 2027",
 };
 
 function emptyBusiness(): BusinessDraft {
@@ -89,12 +102,32 @@ function nowLabel() {
 
 export function ApplicantDraftProvider({ children }: { children: ReactNode }) {
   const { logEvent } = useCaseStore();
+  const [isExistingCustomer, setIsExistingCustomerState] = useState(false);
   const [consentAccepted, setConsentAcceptedState] = useState(false);
   const [tradeLicenceUpload, setTradeLicenceUploadState] = useState<ScanStatus>("idle");
   const [ocrApplied, setOcrApplied] = useState(false);
   const [business, setBusiness] = useState<BusinessDraft>(emptyBusiness);
   const [signatories, setSignatories] = useState<SignatoryDraft[]>(() => [makeSignatory()]);
   const [finalDeclarationAccepted, setFinalDeclarationAcceptedState] = useState(false);
+
+  const setIsExistingCustomer = useCallback(
+    (v: boolean) => {
+      setIsExistingCustomerState(v);
+      if (v) {
+        setBusiness((prev) => ({ ...prev, ...EXISTING_CUSTOMER_RECORD }));
+        logEvent(DEMO_CASE_ID, {
+          label: "Recognized as an existing Meridian Bank customer",
+          actor: "SmartEngine",
+          timestamp: nowLabel(),
+          kind: "status",
+          detail: "Business details pre-filled from the bank's relationship record.",
+        });
+      } else {
+        setBusiness(emptyBusiness());
+      }
+    },
+    [logEvent]
+  );
 
   const setConsentAccepted = useCallback(
     (v: boolean) => {
@@ -135,8 +168,20 @@ export function ApplicantDraftProvider({ children }: { children: ReactNode }) {
   );
 
   const applyOcrExtraction = useCallback(() => {
-    setBusiness((prev) => ({ ...prev, ...EXTRACTED_TRADE_LICENCE }));
     setOcrApplied(true);
+    if (isExistingCustomer) {
+      // The bank's own relationship record is trusted data — OCR only cross-checks
+      // it here, it must never overwrite it.
+      logEvent(DEMO_CASE_ID, {
+        label: "OCR extraction cross-checked against existing customer record",
+        actor: "SmartEngine",
+        timestamp: nowLabel(),
+        kind: "document",
+        detail: "Scanned trade licence matches the details already on file — no changes applied.",
+      });
+      return;
+    }
+    setBusiness((prev) => ({ ...prev, ...EXTRACTED_TRADE_LICENCE }));
     logEvent(DEMO_CASE_ID, {
       label: "OCR extraction applied to business details",
       actor: "SmartEngine",
@@ -144,7 +189,7 @@ export function ApplicantDraftProvider({ children }: { children: ReactNode }) {
       kind: "document",
       detail: "Legal name, trade licence number and expiry prefilled from trade licence scan.",
     });
-  }, [logEvent]);
+  }, [logEvent, isExistingCustomer]);
 
   const updateBusinessField = useCallback(
     <K extends keyof BusinessDraft>(field: K, value: BusinessDraft[K]) => {
@@ -227,6 +272,7 @@ export function ApplicantDraftProvider({ children }: { children: ReactNode }) {
   );
 
   const reset = useCallback(() => {
+    setIsExistingCustomerState(false);
     setConsentAcceptedState(false);
     setTradeLicenceUploadState("idle");
     setOcrApplied(false);
@@ -237,6 +283,8 @@ export function ApplicantDraftProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<ApplicantDraftValue>(
     () => ({
+      isExistingCustomer,
+      setIsExistingCustomer,
       consentAccepted,
       setConsentAccepted,
       tradeLicenceUpload,
@@ -255,6 +303,8 @@ export function ApplicantDraftProvider({ children }: { children: ReactNode }) {
       reset,
     }),
     [
+      isExistingCustomer,
+      setIsExistingCustomer,
       consentAccepted,
       setConsentAccepted,
       tradeLicenceUpload,
