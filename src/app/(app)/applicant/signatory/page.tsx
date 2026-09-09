@@ -123,6 +123,29 @@ export default function SignatoryDetailsPage() {
                   )}
                 </div>
 
+                <Field label="Role / authority basis" hint="We'll verify your identity with your ID next.">
+                  <Select value={s.role} onChange={(e) => updateSignatory(s.id, { role: e.target.value })}>
+                    <option value="" disabled>
+                      Select role
+                    </option>
+                    <option>Owner</option>
+                    <option>General Manager (POA)</option>
+                    <option>Delegated representative</option>
+                  </Select>
+                </Field>
+                <Field label="Mobile number">
+                  <Input value={s.mobile} onChange={(e) => updateSignatory(s.id, { mobile: e.target.value })} placeholder="+971 5X XXX XXXX" />
+                </Field>
+                <Field label="Email">
+                  <Input value={s.email} onChange={(e) => updateSignatory(s.id, { email: e.target.value })} placeholder="name@company.ae" />
+                </Field>
+
+                <hr className="border-[var(--border)]" />
+
+                <span className="text-[12px] font-bold text-[var(--t-ink-strong,var(--ink-strong))]">
+                  Now let&apos;s verify your identity
+                </span>
+
                 <DocumentScanner
                   fileLabel={`signatory_${i + 1}_id.jpg`}
                   status={s.idUpload}
@@ -140,22 +163,6 @@ export default function SignatoryDetailsPage() {
                     onChange={(e) => updateSignatory(s.id, { idNumber: e.target.value })}
                     placeholder="784-XXXX-XXXXXXX-X"
                   />
-                </Field>
-                <Field label="Role / authority basis" hint="Not on your ID — please select it.">
-                  <Select value={s.role} onChange={(e) => updateSignatory(s.id, { role: e.target.value })}>
-                    <option value="" disabled>
-                      Select role
-                    </option>
-                    <option>Owner</option>
-                    <option>General Manager (POA)</option>
-                    <option>Delegated representative</option>
-                  </Select>
-                </Field>
-                <Field label="Mobile number">
-                  <Input value={s.mobile} onChange={(e) => updateSignatory(s.id, { mobile: e.target.value })} placeholder="+971 5X XXX XXXX" />
-                </Field>
-                <Field label="Email">
-                  <Input value={s.email} onChange={(e) => updateSignatory(s.id, { email: e.target.value })} placeholder="name@company.ae" />
                 </Field>
               </Card>
             );
