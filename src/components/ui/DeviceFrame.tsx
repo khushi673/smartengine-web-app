@@ -3,12 +3,21 @@
 import { ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import { useViewMode } from "@/components/shell/ViewModeContext";
+import { useApplicantDraft } from "@/components/shell/ApplicantDraftContext";
 
-const STEPS = [
+const NEW_APPLICANT_STEPS = [
   { href: "/applicant/consent", label: "Consent & privacy notice" },
   { href: "/applicant/documents", label: "Document upload" },
   { href: "/applicant/processing", label: "AI processing & extraction" },
   { href: "/applicant/business", label: "Business details" },
+  { href: "/applicant/signatory", label: "Signatory details" },
+  { href: "/applicant/review", label: "Review & final declaration" },
+];
+
+// Existing customers skip document upload, OCR extraction, and business
+// details review — those are already on file and trusted.
+const EXISTING_CUSTOMER_STEPS = [
+  { href: "/applicant/consent", label: "Consent & privacy notice" },
   { href: "/applicant/signatory", label: "Signatory details" },
   { href: "/applicant/review", label: "Review & final declaration" },
 ];
@@ -49,6 +58,8 @@ function ApplicantWebFrame({
   tenant: "oblavo" | "meridian";
   pathname: string;
 }) {
+  const { isExistingCustomer } = useApplicantDraft();
+  const STEPS = isExistingCustomer ? EXISTING_CUSTOMER_STEPS : NEW_APPLICANT_STEPS;
   const stepIndex = STEPS.findIndex((s) => s.href === pathname);
   const panelMode = pathname === "/applicant" ? "start" : pathname === "/applicant/confirmation" ? "done" : pathname === "/applicant/resubmission" ? "action" : "steps";
 

@@ -12,8 +12,9 @@ export default function ConsentPage() {
   const [checked, setChecked] = useState([false, false]);
   const { tenant } = useTenantTheme();
   const router = useRouter();
-  const { setConsentAccepted } = useApplicantDraft();
+  const { setConsentAccepted, isExistingCustomer } = useApplicantDraft();
   const allChecked = checked.every(Boolean);
+  const totalSteps = isExistingCustomer ? 3 : 6;
 
   const toggle = (i: number) =>
     setChecked((prev) => prev.map((v, idx) => (idx === i ? !v : v)));
@@ -22,11 +23,11 @@ export default function ConsentPage() {
     <PhoneFrame tenant={tenant}>
       <div className="flex flex-col gap-1">
         <span className="text-[10.5px] font-bold tracking-wide text-[var(--t-primary,var(--brand))] uppercase">
-          Step 1 of 6
+          Step 1 of {totalSteps}
         </span>
         <h1 className="text-[19px]">Privacy &amp; consent</h1>
       </div>
-      <ProgressSteps total={6} current={1} />
+      <ProgressSteps total={totalSteps} current={1} />
 
       <div className="max-h-55 overflow-y-auto rounded-[10px] border border-[var(--border)] bg-[var(--t-surface,var(--surface-2))] p-4 text-[12.5px] leading-relaxed text-[var(--t-muted,var(--muted))]">
         <strong className="text-[var(--t-ink,var(--ink))]">Privacy &amp; Data Handling Notice · v2.3</strong>
@@ -37,6 +38,12 @@ export default function ConsentPage() {
         onboarding evaluation. No document will be read or processed until you accept below. Documents are stored securely and only
         accessed by authorised bank personnel and approved verification providers strictly for this application.
       </div>
+
+      {isExistingCustomer && (
+        <p className="text-[12px] text-[var(--t-muted,var(--muted))]">
+          Since we already have your business details on file, we&apos;ll skip straight to confirming your signatories next.
+        </p>
+      )}
 
       <div className="flex flex-col gap-3">
         <label className="flex items-start gap-2.5 text-[12.5px] text-[var(--t-ink,var(--ink))]">
@@ -56,7 +63,7 @@ export default function ConsentPage() {
           disabled={!allChecked}
           onClick={() => {
             setConsentAccepted(true);
-            router.push("/applicant/documents");
+            router.push(isExistingCustomer ? "/applicant/signatory" : "/applicant/documents");
           }}
         >
           Accept &amp; continue

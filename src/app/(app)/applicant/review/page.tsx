@@ -15,8 +15,9 @@ const DEMO_CASE_ID = "alnoor";
 export default function ReviewPage() {
   const { tenant } = useTenantTheme();
   const router = useRouter();
-  const { business, signatories, finalDeclarationAccepted, setFinalDeclarationAccepted } = useApplicantDraft();
+  const { business, signatories, finalDeclarationAccepted, setFinalDeclarationAccepted, isExistingCustomer } = useApplicantDraft();
   const { logEvent } = useCaseStore();
+  const totalSteps = isExistingCustomer ? 3 : 6;
 
   const submit = () => {
     // Logged against the shared demo case without a status change — this walkthrough
@@ -34,10 +35,12 @@ export default function ReviewPage() {
   return (
     <PhoneFrame tenant={tenant}>
       <div className="flex flex-col gap-1">
-        <span className="text-[10.5px] font-bold tracking-wide text-[var(--t-primary,var(--brand))] uppercase">Step 6 of 6</span>
+        <span className="text-[10.5px] font-bold tracking-wide text-[var(--t-primary,var(--brand))] uppercase">
+          Step {totalSteps} of {totalSteps}
+        </span>
         <h1 className="text-[19px]">Review your application</h1>
       </div>
-      <ProgressSteps total={6} current={6} />
+      <ProgressSteps total={totalSteps} current={totalSteps} />
 
       <Card className="flex flex-col gap-2">
         <div className="flex items-center justify-between">

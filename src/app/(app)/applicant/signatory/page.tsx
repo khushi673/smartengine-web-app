@@ -18,7 +18,7 @@ function isComplete(s: SignatoryDraft) {
 export default function SignatoryDetailsPage() {
   const { tenant } = useTenantTheme();
   const router = useRouter();
-  const { signatories, addSignatory, updateSignatory, removeSignatory, setSignatoryUpload } = useApplicantDraft();
+  const { signatories, addSignatory, updateSignatory, removeSignatory, setSignatoryUpload, isExistingCustomer } = useApplicantDraft();
 
   const idCounts = signatories.reduce<Record<string, number>>((acc, s) => {
     if (s.idNumber.trim()) acc[s.idNumber.trim()] = (acc[s.idNumber.trim()] ?? 0) + 1;
@@ -26,16 +26,18 @@ export default function SignatoryDetailsPage() {
   }, {});
 
   const allComplete = signatories.length > 0 && signatories.every(isComplete);
+  const totalSteps = isExistingCustomer ? 3 : 6;
+  const stepNum = isExistingCustomer ? 2 : 5;
 
   return (
     <PhoneFrame tenant={tenant}>
       <div className="flex flex-col gap-1">
         <span className="text-[10.5px] font-bold tracking-wide text-[var(--t-primary,var(--brand))] uppercase">
-          Step 5 of 6 · Signatory details
+          Step {stepNum} of {totalSteps} · Signatory details
         </span>
         <h1 className="text-[19px]">Who is authorised to sign?</h1>
       </div>
-      <ProgressSteps total={6} current={5} />
+      <ProgressSteps total={totalSteps} current={stepNum} />
 
       <p className="text-[12.5px] text-[var(--t-muted,var(--muted))]">
         Add every authorised signatory. Each uploads their own ID — details are extracted and reviewed individually and never mixed
@@ -98,7 +100,7 @@ export default function SignatoryDetailsPage() {
       </Button>
 
       <div className="mt-auto flex gap-2.5 pt-2">
-        <Button variant="secondary" onClick={() => router.push("/applicant/business")}>
+        <Button variant="secondary" onClick={() => router.push(isExistingCustomer ? "/applicant/consent" : "/applicant/business")}>
           Back
         </Button>
         <Button className="flex-1" disabled={!allComplete} onClick={() => router.push("/applicant/review")}>
