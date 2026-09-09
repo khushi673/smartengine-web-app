@@ -7,6 +7,7 @@ export const NAV_GROUPS = [
     label: "Applicant",
     items: [
       { href: "/applicant", title: "Invitation landing" },
+      { href: "/applicant/identity", title: "New or existing customer" },
       { href: "/applicant/consent", title: "Consent & privacy notice" },
       { href: "/applicant/documents", title: "Document upload" },
       { href: "/applicant/processing", title: "AI Processing & Extraction" },
