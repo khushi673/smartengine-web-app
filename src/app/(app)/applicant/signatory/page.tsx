@@ -12,7 +12,14 @@ import { useApplicantDraft, SignatoryDraft } from "@/components/shell/ApplicantD
 import { DocumentScanner } from "@/components/applicant/DocumentScanner";
 
 function isComplete(s: SignatoryDraft) {
-  return s.idUpload === "good" && s.name.trim().length > 0 && s.idNumber.trim().length > 0 && s.mobile.trim().length > 0 && s.email.trim().length > 0;
+  return (
+    s.idUpload === "good" &&
+    s.name.trim().length > 0 &&
+    s.idNumber.trim().length > 0 &&
+    s.role.trim().length > 0 &&
+    s.mobile.trim().length > 0 &&
+    s.email.trim().length > 0
+  );
 }
 
 export default function SignatoryDetailsPage() {
@@ -78,8 +85,11 @@ export default function SignatoryDetailsPage() {
             <Field label="Emirates ID number">
               <Input value={s.idNumber} onChange={(e) => updateSignatory(s.id, { idNumber: e.target.value })} placeholder="784-XXXX-XXXXXXX-X" />
             </Field>
-            <Field label="Role / authority basis">
+            <Field label="Role / authority basis" hint="Not on your ID — please select it.">
               <Select value={s.role} onChange={(e) => updateSignatory(s.id, { role: e.target.value })}>
+                <option value="" disabled>
+                  Select role
+                </option>
                 <option>Owner</option>
                 <option>General Manager (POA)</option>
                 <option>Delegated representative</option>

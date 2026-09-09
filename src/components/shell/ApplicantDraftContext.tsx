@@ -81,7 +81,9 @@ function makeSignatory(): SignatoryDraft {
     id: Math.random().toString(36).slice(2, 9),
     name: "",
     idNumber: "",
-    role: "Owner",
+    // Role, mobile and email are never on an ID document — left blank so the
+    // applicant must actively provide them, not inherit a silent default.
+    role: "",
     mobile: "",
     email: "",
     idUpload: "idle",
